@@ -46,9 +46,7 @@ void FileRetroDataStream::seek(size_t pos) {
 }
 
 void FileRetroDataStream::reserve(size_t size) {
-  auto tmp = pos();
-  fseek(fd, size, SEEK_SET);
-  seek(tmp);
+  //No need to reserve in file, it grows automatically
 }
 
 void FileRetroDataStream::truncate() {

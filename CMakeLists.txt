@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(include)
 
-add_definitions(-Wall -Wextra -Werror)
+add_definitions(-Wall -Wextra -Werror -Wno-unused-parameter)
 
 set(HEADER_FILES
         include/libderp/derpexcept.hpp
