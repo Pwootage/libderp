@@ -1,5 +1,4 @@
 #include "libderp/libderp.hpp"
-
 #include <iostream>
 
 void hello() {

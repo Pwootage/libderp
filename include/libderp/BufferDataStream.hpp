@@ -1,18 +1,24 @@
 #ifndef LIBDERP_BUFFERRETRODATASTREAM_HPP
 #define LIBDERP_BUFFERRETRODATASTREAM_HPP
 
-#include "libderp/IRetroDataStream.hpp"
+#include "libderp/IDataStream.hpp"
 #include <vector>
 
 namespace libderp {
 
-class BufferRetroDataStream : public IRetroDataStream {
+class BufferDataStream : public IDataStream {
 private:
     std::vector<uint8_t> buff;
     size_t curPos;
 
 public:
-    BufferRetroDataStream(size_t startingSize);
+    BufferDataStream() : BufferDataStream(1024) {};
+    BufferDataStream(size_t startingSize);
+    BufferDataStream(const BufferDataStream &) = default;
+    BufferDataStream(BufferDataStream &&) = default;
+    BufferDataStream &operator=(const BufferDataStream &) = default;
+    BufferDataStream &operator=(BufferDataStream &&) = default;
+    ~BufferDataStream() = default;
 
     size_t size() const;
     size_t pos() const override;

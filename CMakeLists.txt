@@ -3,24 +3,46 @@ project(libderp)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(include)
+# ext deps
+add_subdirectory(ext/nod)
+include_directories(${LOGVISOR_INCLUDE_DIR})
+include_directories(ext/nod/include)
 
+# Compiler flags
 add_definitions(-Wall -Wextra -Werror -Wno-unused-parameter)
+
+# Source Files
+include_directories(include)
 
 set(HEADER_FILES
         include/libderp/derpexcept.hpp
         include/libderp/endian.hpp
-        include/libderp/IRetroDataStream.hpp
-        include/libderp/FileRetroDataStream.hpp
-        include/libderp/BufferRetroDataStream.hpp
+        include/libderp/IDataStream.hpp
+        include/libderp/FileDataStream.hpp
+        include/libderp/BufferDataStream.hpp
+        include/libderp/ViewDataStream.hpp
         include/libderp/IBinarySerializable.hpp
         include/libderp/libderp.hpp
         )
 
 set(SOURCE_FILES
-        src/IRetroDataStream/IRetroDataStream.cpp
-        src/IRetroDataStream/FileRetroDataStream.cpp
-        src/IRetroDataStream/BufferRetroDataStream.cpp
+        src/IRetroDataStream/IDataStream.cpp
+        src/IRetroDataStream/FileDataStream.cpp
+        src/IRetroDataStream/BufferDataStream.cpp
+        src/IRetroDataStream/ViewDataStream.cpp
         src/libderp.cpp)
 
-add_library(libderp ${SOURCE_FILES} ${HEADER_FILES})
+# Targets
+add_library(derp ${SOURCE_FILES} ${HEADER_FILES})
+
+add_executable(testderp src/test.cpp)
+target_link_libraries(testderp
+        derp
+        logvisor)
+
+# Platform-specific links
+if (WIN32)
+elseif(APPLE)
+else ()
+    target_link_libraries(testderp pthread dl)
+endif ()

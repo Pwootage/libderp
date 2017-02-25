@@ -8,8 +8,15 @@
 
 namespace libderp {
 
-class IRetroDataStream {
+enum class DataStreamState {
+    ok, error
+};
+
+class IDataStream {
 public:
+    IDataStream() = default;
+    virtual ~IDataStream() = default;
+
     // Implemented in subclass; the base of other methods
     virtual size_t size() const = 0;
     virtual size_t pos() const = 0;
@@ -27,10 +34,10 @@ public:
     int64_t read64();
     float readFloat();
     double readDouble();
+    std::string readString();
 
     template<typename T>
     std::vector<T> readArray(std::size_t count);
-
 
     //Write
     void write8(int8_t v);
@@ -39,13 +46,26 @@ public:
     void write64(int64_t v);
     void writeFloat(float v);
     void writeDouble(double v);
+    void writeString(std::string str);
 
     template<typename T>
     void writeArray(const std::vector<T> &items);
+
+    //Error state
+    DataStreamState state();
+    size_t errorCount();
+    void resetState();
+
+protected:
+    void error();
+
+private:
+    DataStreamState _state = DataStreamState::ok;
+    size_t _errorCount = 0;
 };
 
 template<typename T>
-std::vector<T> IRetroDataStream::readArray(std::size_t count) {
+std::vector<T> IDataStream::readArray(std::size_t count) {
   std::vector<T> res;
   res.reserve(count);
   for (size_t i = 0; i < count; i++) {
@@ -55,7 +75,7 @@ std::vector<T> IRetroDataStream::readArray(std::size_t count) {
 }
 
 template<typename T>
-void IRetroDataStream::writeArray(const std::vector<T> &items) {
+void IDataStream::writeArray(const std::vector<T> &items) {
   for (size_t i = 0; i < items.size(); i++) {
     items[i]->writeTo(this);
   }

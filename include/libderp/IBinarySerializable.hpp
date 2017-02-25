@@ -3,11 +3,11 @@
 
 namespace libderp {
 
-class IRetroDataStream;
+class IDataStream;
 
 class IBinarySerializable {
-    virtual void readFrom(IRetroDataStream stream) = 0;
-    virtual void writeTo(IRetroDataStream stream) = 0;
+    virtual void readFrom(IDataStream stream) = 0;
+    virtual void writeTo(IDataStream stream) = 0;
 };
 
 }

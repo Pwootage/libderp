@@ -2,18 +2,24 @@
 #define LIBDERP_FILERETRODATASTREAM_HPP
 
 #include <cstdio>
-#include "libderp/IRetroDataStream.hpp"
+#include <string>
+#include "libderp/IDataStream.hpp"
 
 namespace libderp {
 
-class FileRetroDataStream : public IRetroDataStream {
+class FileDataStream : public IDataStream {
 private:
     FILE *fd;
-    const char* name;
+    std::string name;
 
 public:
-    FileRetroDataStream(const char *path);
-    ~FileRetroDataStream();
+    FileDataStream(std::string path);
+    ~FileDataStream();
+
+    FileDataStream(const FileDataStream &) = delete;
+    FileDataStream(FileDataStream &&) = delete;
+    FileDataStream &operator=(const FileDataStream &) = delete;
+    FileDataStream &operator=(FileDataStream &&) = delete;
 
     size_t pos() const override;
     void seek(size_t pos) override;
