@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.6)
 project(libderp)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # ext deps
 add_subdirectory(ext/nod)
@@ -43,6 +43,7 @@ target_link_libraries(testderp
 # Platform-specific links
 if (WIN32)
 elseif(APPLE)
+#    target_link_libraries(testderp pthread dl)
 else ()
     target_link_libraries(testderp pthread dl)
 endif ()

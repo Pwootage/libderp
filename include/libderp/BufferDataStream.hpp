@@ -20,7 +20,7 @@ public:
     BufferDataStream &operator=(BufferDataStream &&) = default;
     ~BufferDataStream() = default;
 
-    size_t size() const;
+    size_t size() const override;
     size_t pos() const override;
     void seek(size_t pos) override;
     void reserve(size_t size) override;

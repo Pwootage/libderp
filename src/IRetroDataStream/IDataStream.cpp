@@ -1,3 +1,4 @@
+#include <string>
 #include "libderp/IDataStream.hpp"
 #include "libderp/endian.hpp"
 #include "libderp/derpexcept.hpp"
