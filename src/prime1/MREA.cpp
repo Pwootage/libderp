@@ -39,9 +39,10 @@ MREA::MREA(IDataStream &f) {
   vector<vector<uint8_t>> sections(dataSectionCount);
   for (size_t i = 0; i < dataSectionCount; i++) {
     uint32_t size = sectionSizes[i];
-    sections[i].resize(size);
-    f.readBytes(size, &sections[i]);
+    vector<uint8_t> section(size);
+    f.readBytes(size, &section[0]);
     f.readPaddingTo(32);
+    sections[i] = section;
   }
 
 //  vector<uint8_t> sections = f.read
