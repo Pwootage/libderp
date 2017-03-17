@@ -14,6 +14,8 @@ include_directories(${GLM_INCLUDE_DIRS})
 
 # Compiler flags
 add_definitions(-Wall -Wextra -Werror -Wno-unused-parameter)
+# TODO: remove when complete
+add_definitions(-Wno-error=unused-variable)
 
 # Source Files
 include_directories(include)

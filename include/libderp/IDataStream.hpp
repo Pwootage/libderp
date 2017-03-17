@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <vector>
 #include <functional>
+#include <glm/fwd.hpp>
 
 namespace libderp {
 
@@ -28,6 +29,7 @@ public:
     virtual void writeBytes(std::size_t count, const void *src) = 0;
 
     //Read
+    void readPaddingTo(size_t mod);
     int8_t read8();
     int16_t read16();
     int32_t read32();
@@ -39,14 +41,15 @@ public:
     float readFloat();
     double readDouble();
     std::string readString();
+    glm::vec3 readVec3();
+    glm::vec4 readVec4();
+    glm::mat4x3 readMat4x3();
 
     template<typename T>
-    T read();
-
-    template<typename T>
-    std::vector<T> readArray(std::size_t count);
+    std::vector<T> readArray(size_t count, std::function<T(IDataStream &stream)> generator);
 
     //Write
+    void writePaddingTo(size_t mod, uint8_t v = 0x00);
     void write8(int8_t v);
     void write16(int16_t v);
     void write32(int32_t v);
@@ -57,13 +60,13 @@ public:
     void write64u(uint64_t v);
     void writeFloat(float v);
     void writeDouble(double v);
-    void writeString(std::string str);
+    void writeString(const std::string &str);
+    void writeVec3(const glm::vec3 &vec);
+    void writeVec4(const glm::vec4 &vec);
+    void writeMat4x3(const glm::mat4x3 &mat);
 
     template<typename T>
-    void write(const T &obj);
-
-    template<typename T>
-    void writeArray(const std::vector<T> &items);
+    void writeArray(std::vector<T> vec, std::function<void(IDataStream &stream, const T &obj)> writer);
 
     //Error state
     DataStreamState state();
@@ -77,34 +80,22 @@ private:
     size_t _errorCount = 0;
 };
 
-template <typename T>
-T IDataStream::read() {
-    T res;
-    res.readFrom(*this);
-    return res;
-}
-
 template<typename T>
-std::vector<T> IDataStream::readArray(std::size_t count) {
-  std::vector<T> res;
-  res.reserve(count);
+std::vector<T> IDataStream::readArray(size_t count, std::function<T(IDataStream &stream)> generator) {
+  std::vector<T> res(count);
   for (size_t i = 0; i < count; i++) {
-    res[i]->readFrom(this);
+    res[i] = generator(*this);
   }
   return res;
 }
 
-template <typename T>
-void IDataStream::write(const T &obj) {
-  obj.writeTo(*this);
-}
-
 template<typename T>
-void IDataStream::writeArray(const std::vector<T> &items) {
-  for (size_t i = 0; i < items.size(); i++) {
-    items[i]->writeTo(this);
+void IDataStream::writeArray(std::vector<T> vec, std::function<void(IDataStream &, const T &)> writer) {
+  for (size_t i = 0; i < vec.size(); i++) {
+    writer(*this, vec[i]);
   }
 }
+
 
 }
 

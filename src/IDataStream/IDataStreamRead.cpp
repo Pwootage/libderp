@@ -11,6 +11,14 @@
 namespace libderp {
 using namespace std;
 
+void IDataStream::readPaddingTo(size_t mod) {
+  size_t end = pos();
+  size_t padding = mod - (end % mod);
+  if (padding != mod) {
+    for (size_t i = 0; i < padding; i++) read8();
+  }
+}
+
 template<typename T>
 inline T readBigEndian(IDataStream *stream) {
   T res;
@@ -39,49 +47,37 @@ string IDataStream::readString() {
     c = read8();
   }
   if (i >= LIBDERP_MAX_STR_LEN) {
-    LIBDERP_EXCEPT("String too long (>= LIBDERP_MAX_STR_LEN bytes)")
+    error("String too long (>= %d bytes)", LIBDERP_MAX_STR_LEN);
+    return "";
   }
   return res;
 }
 
-template<typename T, T (IDataStream::*func)()>
-inline vector<T> readPrimitive(IDataStream *stream, size_t count) {
-  vector<T> res;
-  res.reserve(count);
-  for (size_t i = 0; i < count; i++) {
-    res[i] = (stream->*func)();
-  }
+glm::vec3 IDataStream::readVec3() {
+  return {readFloat(), readFloat(), readFloat()};
+}
+
+glm::vec4 IDataStream::readVec4() {
+  return {readFloat(), readFloat(), readFloat(), readFloat()};
+}
+
+glm::mat4x3 IDataStream::readMat4x3() {
+  glm::mat4x3 res;
+
+  res[0][0] = readFloat();
+  res[1][0] = readFloat();
+  res[2][0] = readFloat();
+  res[3][0] = readFloat();
+  res[0][1] = readFloat();
+  res[1][1] = readFloat();
+  res[2][1] = readFloat();
+  res[3][1] = readFloat();
+  res[0][2] = readFloat();
+  res[1][2] = readFloat();
+  res[2][2] = readFloat();
+  res[3][2] = readFloat();
+
   return res;
-}
-
-template<>
-vector<int8_t> IDataStream::readArray(size_t count) {
-  return readPrimitive<int8_t, &IDataStream::read8> (this, count);
-}
-
-template<>
-vector<int16_t> IDataStream::readArray(size_t count) {
-  return readPrimitive<int16_t, &IDataStream::read16> (this, count);
-}
-
-template<>
-vector<int32_t> IDataStream::readArray(size_t count) {
-  return readPrimitive<int32_t, &IDataStream::read32> (this, count);
-}
-
-template<>
-vector<int64_t> IDataStream::readArray(size_t count) {
-  return readPrimitive<int64_t, &IDataStream::read64> (this, count);
-}
-
-template<>
-vector<float> IDataStream::readArray(size_t count) {
-  return readPrimitive<float, &IDataStream::readFloat> (this, count);
-}
-
-template<>
-vector<double> IDataStream::readArray(size_t count) {
-  return readPrimitive<double, &IDataStream::readDouble> (this, count);
 }
 
 }

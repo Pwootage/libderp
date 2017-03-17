@@ -7,7 +7,6 @@ class IDataStream;
 
 class IBinarySerializable {
 public:
-    virtual void readFrom(IDataStream &stream) = 0;
     virtual void writeTo(IDataStream &stream) = 0;
 };
 
