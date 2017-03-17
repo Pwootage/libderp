@@ -28,18 +28,25 @@ FileDataStream::~FileDataStream() {
 }
 
 
-size_t FileDataStream::size() const {
+size_t FileDataStream::size() {
   size_t tmp = pos();
-  fseek(fd, 0, SEEK_END);
+  if (fseek(fd, 0, SEEK_END) < 0) {
+    error("FileDataStream::Failed to seek to end of file to determine size");
+    return 0;
+  }
   size_t size = pos();
-  fseek(fd, tmp, SEEK_SET);
+  if (fseek(fd, tmp, SEEK_SET)) {
+    error("FileDataStream::Failed to seek to pos after determining size");
+    return 0;
+  }
   return size;
 }
 
-size_t FileDataStream::pos() const {
+size_t FileDataStream::pos() {
   long pos = ftell(fd);
   if (pos < 0) {
-    LIBDERP_EXCEPT("Failed to read file pos")
+    error("FileDataStream::Failed to read file pos/ftell() failed");
+    return 0;
   } else {
     return static_cast<size_t>(pos);
   }
@@ -58,16 +65,16 @@ void FileDataStream::truncate() {
 #error TODO: windows ftruncate
 #else
   if (fsync(fileno(fd)) != 0) {
-    error();
-    logger.report(logvisor::Error, "fsync() failed");
+    error("FileDataStream::fsync() failed");
+    return;
   }
   if (ftruncate(fileno(fd), pos()) != 0) {
-    error();
-    logger.report(logvisor::Error, "ftruncate() failed");
+    error("FileDataStream::ftruncate() failed");
+    return;
   }
   if (freopen(name.c_str(), "rb+", fd) != fd) {
-    error();
-    logger.report(logvisor::Error, "freopen() failed");
+    error("FileDataStream::freopen() failed");
+    return;
   };
 #endif
 }

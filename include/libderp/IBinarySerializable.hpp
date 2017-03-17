@@ -6,8 +6,9 @@ namespace libderp {
 class IDataStream;
 
 class IBinarySerializable {
-    virtual void readFrom(IDataStream stream) = 0;
-    virtual void writeTo(IDataStream stream) = 0;
+public:
+    virtual void readFrom(IDataStream &stream) = 0;
+    virtual void writeTo(IDataStream &stream) = 0;
 };
 
 }

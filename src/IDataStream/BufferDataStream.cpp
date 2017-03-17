@@ -5,11 +5,11 @@ libderp::BufferDataStream::BufferDataStream(size_t startingSize) {
   reserve(startingSize);
 }
 
-size_t libderp::BufferDataStream::size() const {
+size_t libderp::BufferDataStream::size() {
   return buff.size();
 }
 
-size_t libderp::BufferDataStream::pos() const {
+size_t libderp::BufferDataStream::pos() {
   return curPos;
 }
 

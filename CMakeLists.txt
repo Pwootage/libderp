@@ -8,6 +8,10 @@ add_subdirectory(ext/nod)
 include_directories(${LOGVISOR_INCLUDE_DIR})
 include_directories(ext/nod/include)
 
+add_subdirectory(ext/glm)
+find_package(glm REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+
 # Compiler flags
 add_definitions(-Wall -Wextra -Werror -Wno-unused-parameter)
 
@@ -22,15 +26,18 @@ set(HEADER_FILES
         include/libderp/BufferDataStream.hpp
         include/libderp/ViewDataStream.hpp
         include/libderp/IBinarySerializable.hpp
-        include/libderp/libderp.hpp
+        include/libderp/prime1/MREA.hpp
         )
 
 set(SOURCE_FILES
-        src/IRetroDataStream/IDataStream.cpp
-        src/IRetroDataStream/FileDataStream.cpp
-        src/IRetroDataStream/BufferDataStream.cpp
-        src/IRetroDataStream/ViewDataStream.cpp
-        src/libderp.cpp)
+        src/IDataStream/IDataStream.cpp
+        src/IDataStream/IDataStreamRead.cpp
+        src/IDataStream/IDataStreamWrite.cpp
+        src/IDataStream/FileDataStream.cpp
+        src/IDataStream/BufferDataStream.cpp
+        src/IDataStream/ViewDataStream.cpp
+        src/prime1/MREA.cpp
+        )
 
 # Targets
 add_library(derp ${SOURCE_FILES} ${HEADER_FILES})

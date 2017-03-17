@@ -15,8 +15,8 @@ public:
     ViewDataStream(ViewDataStream &&) = delete;
     ViewDataStream &operator=(const ViewDataStream &) = delete;
     ViewDataStream &operator=(ViewDataStream &&) = delete;
-    size_t size() const override;
-    size_t pos() const override;
+    size_t size() override;
+    size_t pos() override;
     void seek(size_t pos) override;
     void reserve(size_t size) override;
     void truncate() override;

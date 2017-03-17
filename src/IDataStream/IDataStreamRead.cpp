@@ -1,4 +1,7 @@
 #include <string>
+#include <glm/vec3.hpp>
+#include <glm/mat4x3.hpp>
+#include <logvisor/logvisor.hpp>
 #include "libderp/IDataStream.hpp"
 #include "libderp/endian.hpp"
 #include "libderp/derpexcept.hpp"
@@ -19,6 +22,10 @@ int8_t IDataStream::read8() { return readBigEndian<int8_t>(this); }
 int16_t IDataStream::read16() { return readBigEndian<int16_t>(this); }
 int32_t IDataStream::read32() { return readBigEndian<int32_t>(this); }
 int64_t IDataStream::read64() { return readBigEndian<int64_t>(this); }
+uint8_t IDataStream::read8u() { return readBigEndian<uint8_t>(this); }
+uint16_t IDataStream::read16u() { return readBigEndian<uint16_t>(this); }
+uint32_t IDataStream::read32u() { return readBigEndian<uint32_t>(this); }
+uint64_t IDataStream::read64u() { return readBigEndian<uint64_t>(this); }
 float IDataStream::readFloat() { return readBigEndian<float>(this); }
 double IDataStream::readDouble() { return readBigEndian<double>(this); }
 
@@ -75,81 +82,6 @@ vector<float> IDataStream::readArray(size_t count) {
 template<>
 vector<double> IDataStream::readArray(size_t count) {
   return readPrimitive<double, &IDataStream::readDouble> (this, count);
-}
-
-
-template<typename T>
-inline void writeBigEndian(IDataStream *stream, T src) {
-  T v = endian::big(src);
-  stream->writeBytes(sizeof(T), &v);
-}
-
-void IDataStream::write8(int8_t v) { return writeBigEndian(this, v); }
-void IDataStream::write16(int16_t v) { return writeBigEndian(this, v); }
-void IDataStream::write32(int32_t v) { return writeBigEndian(this, v); }
-void IDataStream::write64(int64_t v) { return writeBigEndian(this, v); }
-void IDataStream::writeFloat(float v) { return writeBigEndian(this, v); }
-void IDataStream::writeDouble(double v) { return writeBigEndian(this, v); }
-
-void IDataStream::writeString(std::string str) {
-  writeBytes(str.length(), str.c_str());
-  write8(0);
-}
-
-template<typename T, void (IDataStream::*func)(T)>
-inline void writePrimitive(IDataStream *stream, vector<T> vec) {
-  for (size_t i = 0; i < vec.size(); i++) {
-    (stream->*func)(vec[i]);
-  }
-}
-
-template<>
-void IDataStream::writeArray(const vector<int8_t> &vec) {
-  return writePrimitive<int8_t, &IDataStream::write8> (this, vec);
-}
-
-template<>
-void IDataStream::writeArray(const vector<int16_t> &vec) {
-  return writePrimitive<int16_t, &IDataStream::write16> (this, vec);
-}
-
-template<>
-void IDataStream::writeArray(const vector<int32_t> &vec) {
-  return writePrimitive<int32_t, &IDataStream::write32> (this, vec);
-}
-
-template<>
-void IDataStream::writeArray(const vector<int64_t> &vec) {
-  return writePrimitive<int64_t, &IDataStream::write64> (this, vec);
-}
-
-template<>
-void IDataStream::writeArray(const vector<float> &vec) {
-  return writePrimitive<float, &IDataStream::writeFloat> (this, vec);
-}
-
-template<>
-void IDataStream::writeArray(const vector<double> &vec) {
-  return writePrimitive<double, &IDataStream::writeDouble> (this, vec);
-}
-
-
-DataStreamState IDataStream::state() {
-  return _state;
-}
-
-size_t IDataStream::errorCount() {
-  return _errorCount;
-}
-
-void IDataStream::resetState() {
-  _state = DataStreamState::ok;
-  _errorCount = 0;
-}
-
-void IDataStream::error() {
-  _state = DataStreamState::error;
-  _errorCount++;
 }
 
 }

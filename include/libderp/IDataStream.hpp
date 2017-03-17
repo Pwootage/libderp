@@ -18,8 +18,8 @@ public:
     virtual ~IDataStream() = default;
 
     // Implemented in subclass; the base of other methods
-    virtual size_t size() const = 0;
-    virtual size_t pos() const = 0;
+    virtual size_t size() = 0;
+    virtual size_t pos() = 0;
     virtual void seek(size_t pos) = 0;
     virtual void reserve(size_t size) = 0;
     virtual void truncate() = 0;
@@ -32,9 +32,16 @@ public:
     int16_t read16();
     int32_t read32();
     int64_t read64();
+    uint8_t read8u();
+    uint16_t read16u();
+    uint32_t read32u();
+    uint64_t read64u();
     float readFloat();
     double readDouble();
     std::string readString();
+
+    template<typename T>
+    T read();
 
     template<typename T>
     std::vector<T> readArray(std::size_t count);
@@ -44,9 +51,16 @@ public:
     void write16(int16_t v);
     void write32(int32_t v);
     void write64(int64_t v);
+    void write8u(uint8_t v);
+    void write16u(uint16_t v);
+    void write32u(uint32_t v);
+    void write64u(uint64_t v);
     void writeFloat(float v);
     void writeDouble(double v);
     void writeString(std::string str);
+
+    template<typename T>
+    void write(const T &obj);
 
     template<typename T>
     void writeArray(const std::vector<T> &items);
@@ -56,13 +70,19 @@ public:
     size_t errorCount();
     void resetState();
 
-protected:
-    void error();
+    void error(const char *format, ...) __printflike(2, 3);
 
 private:
     DataStreamState _state = DataStreamState::ok;
     size_t _errorCount = 0;
 };
+
+template <typename T>
+T IDataStream::read() {
+    T res;
+    res.readFrom(*this);
+    return res;
+}
 
 template<typename T>
 std::vector<T> IDataStream::readArray(std::size_t count) {
@@ -72,6 +92,11 @@ std::vector<T> IDataStream::readArray(std::size_t count) {
     res[i]->readFrom(this);
   }
   return res;
+}
+
+template <typename T>
+void IDataStream::write(const T &obj) {
+  obj.writeTo(*this);
 }
 
 template<typename T>
